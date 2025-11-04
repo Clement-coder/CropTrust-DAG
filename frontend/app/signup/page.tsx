@@ -8,7 +8,7 @@ import { useUser } from "@/hooks/use-user"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "framer-motion"
-import { ChevronRight, ChevronLeft, CheckCircle } from "lucide-react"
+import { User, Mail, MapPin, ChevronRight, ChevronLeft, CheckCircle, ArrowLeft } from "lucide-react"
 import { Navigation } from "@/components/navigation"
 
 type SignupStep = 1 | 2 | 3
@@ -92,26 +92,26 @@ export default function SignupPage() {
                 <p className="text-sm text-muted-foreground mt-2">Let's start with your basic information</p>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Your full name"
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </CardContent>
@@ -155,15 +155,15 @@ export default function SignupPage() {
                 </motion.button>
 
                 {/* Location field */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
                     placeholder="Your city or region"
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </CardContent>
