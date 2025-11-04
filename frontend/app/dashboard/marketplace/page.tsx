@@ -145,7 +145,7 @@ export default function MarketplacePage() {
           Marketplace
         </motion.h1>
 
-        <div className="grid lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters */}
           <div>
             <Filters onFilterChange={setFilters} />
@@ -181,7 +181,7 @@ export default function MarketplacePage() {
             {/* Products Grid */}
             {paginatedCrops.length > 0 ? (
               <>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                   {paginatedCrops.map((crop) => (
                     <CropCard key={crop.id} {...crop} />
                   ))}
