@@ -3,21 +3,21 @@
 import type React from "react"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useUser } from "@/hooks/use-user"
+import { usePrivy } from "@privy-io/react-auth"
 import { Sidebar } from "./sidebar"
 import { TopBar } from "./topbar"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user, isLoading } = useUser()
+  const { ready, authenticated } = usePrivy()
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login")
+    if (ready && !authenticated) {
+      router.push("/")
     }
-  }, [user, isLoading, router])
+  }, [ready, authenticated, router])
 
-  if (isLoading) {
+  if (!ready || !authenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -26,10 +26,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     )
-  }
-
-  if (!user) {
-    return null
   }
 
   return (

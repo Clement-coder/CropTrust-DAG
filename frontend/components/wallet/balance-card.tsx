@@ -1,13 +1,29 @@
-"use client"
-
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { Eye, EyeOff, Copy } from "lucide-react"
+'use client';
+import { useState } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Copy } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { QRCodeSVG } from 'qrcode.react';
 
 export function BalanceCard() {
-  const [isVisible, setIsVisible] = useState(true)
+  const { user } = usePrivy();
+  const [isVisible, setIsVisible] = useState(true);
+
+  const copyToClipboard = () => {
+    if (user?.wallet?.address) {
+      navigator.clipboard.writeText(user.wallet.address);
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
@@ -18,8 +34,7 @@ export function BalanceCard() {
               <p className="text-sm opacity-80 mb-2">Total Balance</p>
               <div className="flex items-end gap-4">
                 <div className="flex items-baseline gap-2">
-                  <h2 className="text-5xl font-bold">{isVisible ? "₦245,630" : "••••••"}</h2>
-                  <span className="text-lg opacity-90">.50</span>
+                  <h2 className="text-5xl font-bold">{isVisible ? '₦0.00' : '••••••'}</h2>
                 </div>
                 <button
                   onClick={() => setIsVisible(!isVisible)}
@@ -31,9 +46,25 @@ export function BalanceCard() {
             </div>
 
             <div className="flex gap-2 flex-wrap">
-              <Button size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                Deposit Funds
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                    Deposit Funds
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Deposit Funds</DialogTitle>
+                    <DialogDescription>
+                      Scan the QR code or copy the address below to deposit funds into your wallet.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col items-center gap-4">
+                    <QRCodeSVG value={user?.wallet?.address || ''} size={256} />
+                    <p className="text-sm font-semibold break-all">{user?.wallet?.address}</p>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Button
                 size="sm"
                 variant="outline"
@@ -45,25 +76,22 @@ export function BalanceCard() {
                 size="sm"
                 variant="outline"
                 className="border-primary-foreground text-primary-foreground hover:bg-white/10 bg-transparent"
+                onClick={copyToClipboard}
               >
                 <Copy size={16} />
-                Account ID
+                Copy Address
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary-foreground/30">
+            <div className="grid grid-cols-1 gap-4 pt-4 border-t border-primary-foreground/30">
               <div>
-                <p className="text-xs opacity-80">Available</p>
-                <p className="text-xl font-semibold">{isVisible ? "₦200,000" : "•••••"}</p>
-              </div>
-              <div>
-                <p className="text-xs opacity-80">On Hold</p>
-                <p className="text-xl font-semibold">{isVisible ? "₦45,630" : "•••••"}</p>
+                <p className="text-xs opacity-80">Wallet Address</p>
+                <p className="text-sm font-semibold break-all">{user?.wallet?.address}</p>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

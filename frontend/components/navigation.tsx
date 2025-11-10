@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X, AppWindow, Globe, FileText, Mail, LogIn, ArrowRight, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { usePrivy } from "@privy-io/react-auth"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const { ready, authenticated, logout } = usePrivy()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,7 +29,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-serif text-xl font-bold text-primary">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">🌱</div>
+          <Image src="/CroptrustLog.png" alt="CropTrust Logo" width={32} height={32} />
           CropTrust
         </Link>
 
@@ -36,7 +39,7 @@ export function Navigation() {
             <AppWindow size={18} />
             How It Works
           </Link>
-          <Link href="#marketplace" className="flex items-center gap-2 text-foreground hover:text-primary transition">
+          <Link href="/dashboard/marketplace" className="flex items-center gap-2 text-foreground hover:text-primary transition">
             <Globe size={18} />
             Marketplace
           </Link>
@@ -56,18 +59,28 @@ export function Navigation() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex gap-3">
-          <Button variant="outline" asChild>
-            <Link href="/login" className="flex items-center gap-2">
-              <LogIn size={18} />
-              Sign In
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/signup" className="flex items-center gap-2">
-              <ArrowRight size={18} />
-              Get Started
-            </Link>
-          </Button>
+          {!ready && <div />}
+          {ready && !authenticated && (
+            <Button variant="outline" asChild>
+              <Link href="/signup" className="flex items-center gap-2">
+                <LogIn size={18} />
+                Sign Up
+              </Link>
+            </Button>
+          )}
+          {ready && authenticated && (
+            <>
+              <Button variant="outline" asChild>
+                <Link href="/dashboard" className="flex items-center gap-2">
+                  Dashboard
+                </Link>
+              </Button>
+              <Button onClick={logout} className="flex items-center gap-2">
+                <ArrowRight size={18} />
+                Logout
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -89,7 +102,7 @@ export function Navigation() {
               How It Works
             </Link>
             <Link
-              href="#marketplace"
+              href="/dashboard/marketplace"
               className="flex items-center gap-2 text-foreground hover:text-primary transition"
               onClick={() => setIsOpen(false)}
             >
@@ -120,18 +133,28 @@ export function Navigation() {
               <MessageSquare size={18} />
               Testimonials
             </Link>
-            <Button className="w-full bg-transparent" variant="outline" asChild onClick={() => setIsOpen(false)}>
-              <Link href="/login" className="flex items-center gap-2">
-                <LogIn size={18} />
-                Sign In
-              </Link>
-            </Button>
-            <Button className="w-full" asChild onClick={() => setIsOpen(false)}>
-              <Link href="/signup" className="flex items-center gap-2">
-                <ArrowRight size={18} />
-                Get Started
-              </Link>
-            </Button>
+            {!ready && <div />}
+            {ready && !authenticated && (
+              <Button variant="outline" asChild>
+                <Link href="/signup" className="flex items-center gap-2">
+                  <LogIn size={18} />
+                  Sign Up
+                </Link>
+              </Button>
+            )}
+            {ready && authenticated && (
+              <>
+                <Button variant="outline" asChild>
+                  <Link href="/dashboard" className="flex items-center gap-2">
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button onClick={logout} className="flex items-center gap-2">
+                  <ArrowRight size={18} />
+                  Logout
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

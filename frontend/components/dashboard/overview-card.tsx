@@ -6,11 +6,9 @@ interface OverviewCardProps {
   label: string
   value: string | number
   icon: string
-  trend?: "up" | "down" | "neutral"
-  change?: string
 }
 
-export function OverviewCard({ label, value, icon, trend, change }: OverviewCardProps) {
+export function OverviewCard({ label, value, icon }: OverviewCardProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
       <Card>
@@ -19,15 +17,6 @@ export function OverviewCard({ label, value, icon, trend, change }: OverviewCard
             <div>
               <p className="text-sm text-muted-foreground mb-2">{label}</p>
               <p className="text-3xl font-bold text-foreground">{value}</p>
-              {change && (
-                <p
-                  className={`text-xs mt-2 ${
-                    trend === "up" ? "text-success" : trend === "down" ? "text-destructive" : "text-muted-foreground"
-                  }`}
-                >
-                  {trend === "up" ? "↑" : trend === "down" ? "↓" : "→"} {change}
-                </p>
-              )}
             </div>
             <div className="text-4xl">{icon}</div>
           </div>

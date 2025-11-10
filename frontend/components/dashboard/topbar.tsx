@@ -1,10 +1,10 @@
 "use client"
-import { useUser } from "@/hooks/use-user"
+import { usePrivy } from "@privy-io/react-auth"
 import { Bell, Search } from "lucide-react"
 import { motion } from "framer-motion"
 
 export function TopBar() {
-  const { user } = useUser()
+  const { user } = usePrivy()
 
   return (
     <div className="h-16 bg-background border-b border-border flex items-center justify-between px-6">
@@ -35,11 +35,10 @@ export function TopBar() {
         {/* User Avatar */}
         <div className="flex items-center gap-3 pl-4 border-l border-border">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-foreground">Welcome, {user?.name || "User"}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
+            <p className="text-sm font-semibold text-foreground">Welcome, {user?.google?.name || "User"}</p>
           </div>
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
-            {user?.name?.charAt(0) || "U"}
+            {user?.google?.name?.charAt(0) || "U"}
           </div>
         </div>
       </div>
