@@ -4,7 +4,7 @@ import { usePrivy } from '@privy-io/react-auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Copy } from 'lucide-react';
+import { Eye, EyeOff, Copy, Check, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,10 +18,15 @@ import { QRCodeSVG } from 'qrcode.react';
 export function BalanceCard() {
   const { user } = usePrivy();
   const [isVisible, setIsVisible] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
 
   const copyToClipboard = () => {
     if (user?.wallet?.address) {
       navigator.clipboard.writeText(user.wallet.address);
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
     }
   };
 
@@ -49,6 +54,7 @@ export function BalanceCard() {
               <Dialog>
                 <DialogTrigger asChild>
                   <Button size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                    <ArrowDownToLine size={16} className="mr-2" />
                     Deposit Funds
                   </Button>
                 </DialogTrigger>
@@ -70,6 +76,7 @@ export function BalanceCard() {
                 variant="outline"
                 className="border-primary-foreground text-primary-foreground hover:bg-white/10 bg-transparent"
               >
+                <ArrowUpFromLine size={16} className="mr-2" />
                 Withdraw
               </Button>
               <Button
@@ -78,8 +85,8 @@ export function BalanceCard() {
                 className="border-primary-foreground text-primary-foreground hover:bg-white/10 bg-transparent"
                 onClick={copyToClipboard}
               >
-                <Copy size={16} />
-                Copy Address
+                {isCopied ? <Check size={16} /> : <Copy size={16} />}
+                {isCopied ? 'Copied!' : 'Copy Address'}
               </Button>
             </div>
 
