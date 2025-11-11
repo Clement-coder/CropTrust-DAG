@@ -127,11 +127,9 @@ const marketplaceCrops = listings.map((listing) => {
                 onClick={() => setIsCartOpen(true)}
               >
                 <ShoppingCart size={20} />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                    {cartItems.length}
-                  </span>
-                )}
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                  {cartItems.length}
+                </span>
               </Button>
             </div>
 
