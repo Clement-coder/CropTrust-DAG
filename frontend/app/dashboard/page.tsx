@@ -23,19 +23,20 @@ export default function DashboardPage() {
   const totalListedProducts = listings.length;
   const cropsListed = listings.length; // Assuming "Crops Listed" is the same as total listed products
 
-  const moneyEarned = listings
-    .filter(listing => listing.status === "sold out")
-    .reduce((sum, listing) => {
-      const priceValue = parseFloat(listing.price.replace(/[^0-9.-]+/g, ""));
-      return sum + (isNaN(priceValue) ? 0 : priceValue);
-    }, 0);
+ const moneyEarned = listings
+  .filter(listing => listing.status === "sold out")
+  .reduce((sum, listing) => {
+    const priceValue = parseFloat(String(listing.price).replace(/[^0-9.-]+/g, ""));
+    return sum + (isNaN(priceValue) ? 0 : priceValue);
+  }, 0);
 
-  const moneyInEscrow = listings
-    .filter(listing => listing.status === "active")
-    .reduce((sum, listing) => {
-      const priceValue = parseFloat(listing.price.replace(/[^0-9.-]+/g, ""));
-      return sum + (isNaN(priceValue) ? 0 : priceValue);
-    }, 0);
+const moneyInEscrow = listings
+  .filter(listing => listing.status === "active")
+  .reduce((sum, listing) => {
+    const priceValue = parseFloat(String(listing.price).replace(/[^0-9.-]+/g, ""));
+    return sum + (isNaN(priceValue) ? 0 : priceValue);
+  }, 0);
+
 
   const containerVariants = {
     hidden: { opacity: 0 },

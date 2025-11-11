@@ -150,14 +150,14 @@ export default function ListingsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listings.length === 0 ? (
+                    {listings.filter(l => l.status === 'active').length === 0 ? (
                       <tr>
                         <td colSpan={8} className="text-center py-8 text-muted-foreground">
-                          No listings yet. Click "New Listing" to add one.
+                          No active listings yet. Click "New Listing" to add one.
                         </td>
                       </tr>
                     ) : (
-                      listings.map((listing, index) => (
+                      listings.filter(l => l.status === 'active').map((listing, index) => (
                         <motion.tr
                           key={listing.id}
                           className="border-b border-border hover:bg-muted/50 transition"
@@ -200,6 +200,68 @@ export default function ListingsPage() {
                             <Button size="sm" variant="outline" className="text-destructive bg-transparent" onClick={() => handleDeleteClick(listing.id)}>
                               <Trash2 size={16} />
                             </Button>
+                          </td>
+                        </motion.tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>My Orders</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Image</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Quantity</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Price</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listings.filter(l => l.status === 'sold out').length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="text-center py-8 text-muted-foreground">
+                          You haven't purchased any items yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      listings.filter(l => l.status === 'sold out').map((listing, index) => (
+                        <motion.tr
+                          key={listing.id}
+                          className="border-b border-border hover:bg-muted/50 transition"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <td className="py-4 px-4">
+                            {listing.image ? (
+                              <img src={listing.image} alt={listing.name} className="w-16 h-16 object-cover rounded-md" />
+                            ) : (
+                              <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center text-muted-foreground">
+                                <ImageIcon size={24} />
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-4 px-4">{listing.name}</td>
+                          <td className="py-4 px-4 text-muted-foreground">{listing.quantity}</td>
+                          <td className="py-4 px-4 font-semibold text-primary">${listing.price}</td>
+                          <td className="py-4 px-4">
+                            <span
+                              className={`text-xs px-3 py-1 rounded-full font-medium bg-muted text-muted-foreground`}
+                            >
+                              Purchased
+                            </span>
                           </td>
                         </motion.tr>
                       ))

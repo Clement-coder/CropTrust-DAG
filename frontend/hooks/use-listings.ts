@@ -135,5 +135,18 @@ export function useListings() {
     setListings((prevListings) => prevListings.filter((listing) => listing.id !== id))
   }
 
-  return { listings, addListing, updateListing, deleteListing }
+  const addPurchasedItems = (purchasedItems: any[]) => {
+    const newPurchasedListings: Listing[] = purchasedItems.map((item) => ({
+      ...item,
+      id: crypto.randomUUID(),
+      status: "sold out" as const,
+      views: 0,
+      inquiries: 0,
+      ownerId: "user-123", // This should be the current user's ID
+      createdAt: new Date().toISOString(),
+    }))
+    setListings((prevListings) => [...prevListings, ...newPurchasedListings])
+  }
+
+  return { listings, addListing, updateListing, deleteListing, addPurchasedItems }
 }
