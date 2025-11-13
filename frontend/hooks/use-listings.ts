@@ -1,152 +1,188 @@
-import { useState, useEffect } from "react"
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
+import { usePrivy } from "@privy-io/react-auth";
+import { useCropTrust } from "./use-croptrust";
+import { useQueryClient, useQueries } from "@tanstack/react-query";
+import { readContract } from "@wagmi/core";
+import { config } from "@/app/config/wagmi";
+import { cropTrustAbi } from "../src/generated";
+import { useReadCropTrustTotalCrops } from "../src/generated";
 
 export interface Listing {
-  id: string
-  name: string
-  quantity: string
-  price: string
-  status: "active" | "sold out"
-  views: number
-  inquiries: number
-  image?: string
-  ownerId: string
-  createdAt: string // Added createdAt
+  id: number;
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  imageUrl: string;
+  seller: string;
+  isListed: boolean;
+  status: "active" | "sold out";
+  views: number;
+  inquiries: number;
+  createdAt: string;
 }
 
-const LOCAL_STORAGE_KEY = "my-listings"
-
 export function useListings() {
-  const [listings, setListings] = useState<Listing[]>(() => {
-    try {
-      const storedListings = localStorage.getItem(LOCAL_STORAGE_KEY)
-      if (storedListings) {
-        return JSON.parse(storedListings)
-      }
-      // Dummy data for initial load if no listings in local storage
-      return [
-        {
-          id: "crop-1",
-          name: "Organic Tomatoes",
-          quantity: "100 kg",
-          price: "2.50",
-          status: "active",
-          views: 120,
-          inquiries: 15,
-          image: "/images/tomato.jpg", // Assuming you have some dummy images
-          ownerId: "user-123", // Owned by current user
-          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-        },
-        {
-          id: "crop-2",
-          name: "Fresh Lettuce",
-          quantity: "50 heads",
-          price: "1.20",
-          status: "active",
-          views: 80,
-          inquiries: 10,
-          image: "/images/lettuce.jpg",
-          ownerId: "user-456", // Owned by another user
-          createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-        },
-        {
-          id: "crop-3",
-          name: "Sweet Potatoes",
-          quantity: "200 kg",
-          price: "1.80",
-          status: "active",
-          views: 150,
-          inquiries: 20,
-          image: "/images/sweet-potato.jpg",
-          ownerId: "user-123", // Owned by current user
-          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-        },
-        {
-          id: "crop-4",
-          name: "Bell Peppers",
-          quantity: "75 kg",
-          price: "3.00",
-          status: "sold out",
-          views: 90,
-          inquiries: 5,
-          image: "/images/bell-pepper.jpg",
-          ownerId: "user-789", // Owned by another user
-          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-        },
-        {
-          id: "crop-5",
-          name: "Organic Carrots",
-          quantity: "120 kg",
-          price: "1.00",
-          status: "active",
-          views: 110,
-          inquiries: 12,
-          image: "/images/carrot.jpg",
-          ownerId: "user-456", // Owned by another user
-          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-        },
-        {
-          id: "crop-6",
-          name: "Cucumbers",
-          quantity: "60 kg",
-          price: "1.50",
-          status: "active",
-          views: 70,
-          inquiries: 8,
-          image: "/images/cucumber.jpg",
-          ownerId: "user-123", // Owned by current user
-          createdAt: new Date().toISOString(), // Today
-        },
-      ]
-    } catch (error) {
-      console.error("Failed to load listings from local storage", error)
-      return []
-    }
-  })
+  const { user } = usePrivy();
+  const { listCrop, isListCropConfirmed, isListingCrop, listCropError } =
+    useCropTrust();
 
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [isLoadingListings, setIsLoadingListings] = useState(true);
+  const [listingsError, setListingsError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const {
+    data: totalCropsData,
+    isLoading: isLoadingTotalCrops,
+    error: totalCropsError,
+  } = useReadCropTrustTotalCrops();
+
+  // Compute crop IDs
+  const cropIds = useMemo(() => {
+    if (!totalCropsData) return [];
+    return Array.from({ length: Number(totalCropsData) }, (_, i) => i + 1);
+  }, [totalCropsData]);
+
+  // Fetch all crops
+  const cropQueries = useQueries({
+    queries: cropIds.map((id) => ({
+      queryKey: ["crop", id],
+      queryFn: async () => {
+        try {
+          const crop = await readContract(config, {
+            abi: cropTrustAbi,
+            address: process.env.NEXT_PUBLIC_CROPTRUST_CONTRACT as `0x${string}`,
+            functionName: "getCrop",
+            args: [BigInt(id)],
+          });
+          return crop;
+        } catch (err) {
+          console.error(`Error fetching crop ${id}:`, err);
+          throw err;
+        }
+      },
+      enabled: !!id,
+    })),
+  });
+
+  // Build listings when all crops loaded
   useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(listings))
-    } catch (error) {
-      console.error("Failed to save listings to local storage", error)
+    if (isLoadingTotalCrops) {
+      setIsLoadingListings(true);
+      return;
     }
-  }, [listings])
 
-  const addListing = (newListing: Omit<Listing, "id" | "views" | "inquiries" | "ownerId" | "createdAt">, ownerId: string) => {
-    const listingWithId: Listing = {
-      ...newListing,
-      id: crypto.randomUUID(),
-      views: 0,
-      inquiries: 0,
-      ownerId: ownerId,
-      createdAt: new Date().toISOString(), // Assign current timestamp
+    if (totalCropsError) {
+      setListingsError(totalCropsError.message);
+      setIsLoadingListings(false);
+      return;
     }
-    setListings((prevListings) => [...prevListings, listingWithId])
-  }
+
+    if (cropQueries.length === 0) {
+      setListings([]);
+      setIsLoadingListings(false);
+      return;
+    }
+
+    const allLoaded = cropQueries.every((q) => !q.isLoading && !q.isFetching);
+    if (!allLoaded) return;
+
+    const anyError = cropQueries.some((q) => q.isError);
+    if (anyError) setListingsError("Failed to load some crops");
+
+    const fetchedListings: Listing[] = cropQueries
+      .map((q, i) => {
+        const crop = q.data as any;
+        if (!crop) return null;
+
+        const [id, name, description, price, quantity, imageUrl, seller, isListed] =
+          Object.values(crop);
+
+        return {
+          id: Number(id ?? i + 1),
+          name: name || "Unnamed Crop",
+          description: description || "No description provided",
+          price: Number(price ?? 0),
+          quantity: Number(quantity ?? 0),
+          imageUrl: imageUrl || "/placeholder.jpg",
+          seller: seller || "Unknown",
+          isListed: Boolean(isListed),
+          status: isListed && Number(quantity) > 0 ? "active" : "sold out",
+          views: 0,
+          inquiries: 0,
+          createdAt: new Date().toISOString(),
+        };
+      })
+      .filter(Boolean) as Listing[];
+
+    setListings(fetchedListings);
+    setIsLoadingListings(false);
+  }, [isLoadingTotalCrops, totalCropsError, cropQueries]);
+
+  // Re-fetch crops after a successful listing
+  useEffect(() => {
+    if (isListCropConfirmed) {
+      console.log("✅ Crop listed successfully!");
+      queryClient.invalidateQueries({ queryKey: ["totalCrops"] });
+      queryClient.invalidateQueries({ queryKey: ["crop"] });
+    }
+  }, [isListCropConfirmed, queryClient]);
+
+  // Add a new listing (on-chain)
+  const addListing = async (
+    newListing: Omit<
+      Listing,
+      "id" | "views" | "inquiries" | "seller" | "isListed" | "status" | "createdAt"
+    >
+  ) => {
+    if (!user?.wallet) {
+      console.error("User not authenticated or wallet not connected.");
+      return;
+    }
+
+    try {
+      await listCrop({
+        args: [
+          newListing.name,
+          newListing.description,
+          BigInt(newListing.price),
+          BigInt(newListing.quantity),
+          newListing.imageUrl,
+        ],
+      });
+    } catch (error) {
+      console.error("Error listing crop:", error);
+    }
+  };
 
   const updateListing = (updatedListing: Listing) => {
-    setListings((prevListings) =>
-      prevListings.map((listing) =>
-        listing.id === updatedListing.id ? updatedListing : listing
-      )
-    )
-  }
+    setListings((prev) =>
+      prev.map((l) => (l.id === updatedListing.id ? updatedListing : l))
+    );
+  };
 
-  const deleteListing = (id: string) => {
-    setListings((prevListings) => prevListings.filter((listing) => listing.id !== id))
-  }
+  const deleteListing = (id: number) => {
+    setListings((prev) => prev.filter((l) => l.id !== id));
+  };
 
   const addPurchasedItems = (purchasedItems: any[]) => {
-    const newPurchasedListings: Listing[] = purchasedItems.map((item) => ({
-      ...item,
-      id: crypto.randomUUID(),
-      status: "sold out" as const,
-      views: 0,
-      inquiries: 0,
-      ownerId: "user-123", // This should be the current user's ID
-      createdAt: new Date().toISOString(),
-    }))
-    setListings((prevListings) => [...prevListings, ...newPurchasedListings])
-  }
+    console.warn(
+      "⚠️ addPurchasedItems() needs to be updated for smart contract integration."
+    );
+  };
 
-  return { listings, addListing, updateListing, deleteListing, addPurchasedItems }
+  return {
+    listings,
+    addListing,
+    updateListing,
+    deleteListing,
+    addPurchasedItems,
+    isListingCrop,
+    listCropError,
+    isLoadingListings,
+    listingsError,
+  };
 }

@@ -14,14 +14,14 @@ interface CropCardProps extends Omit<Product, "price" | "quantity"> {
   handleContactClick: (farmer: string, crop: string) => void
 }
 
-export function CropCard({ id, name, farmer, location, price, quantity, rating, reviews, image, inStock, addToCart, handleContactClick, isOwner, createdAt, status, ownerId, views, inquiries }: CropCardProps) {
+export function CropCard({ id, name, seller, price, quantity, rating, reviews, imageUrl, inStock, addToCart, handleContactClick, isOwner, createdAt, status, views, inquiries, description, isListed }: CropCardProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _id = id
 
   const [isAdded, setIsAdded] = useState(false)
 
   const handleAddToCart = () => {
-    addToCart({ id, name, price: parseFloat(price), quantity: parseInt(quantity), rating, reviews, image, inStock, farmer, location, isOwner, createdAt, status, ownerId, views, inquiries }, 1) // Pass 1 as default quantity
+    addToCart({ id, name, description, price: parseFloat(price), quantity: parseInt(quantity), rating, reviews, imageUrl, inStock, seller, isOwner, createdAt, status, views, inquiries, isListed }, 1) // Pass 1 as default quantity
     setIsAdded(true)
     setTimeout(() => {
       setIsAdded(false)
@@ -48,8 +48,8 @@ export function CropCard({ id, name, farmer, location, price, quantity, rating, 
       <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
         {/* Image */}
         <div className="w-full h-48 relative overflow-hidden">
-          {image ? (
-            <Image src={image} alt={name} layout="fill" objectFit="cover" className="rounded-md" />
+          {imageUrl ? (
+            <Image src={imageUrl} alt={name} layout="fill" objectFit="cover" className="rounded-md" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
               <span className="text-5xl">🌾</span>
@@ -66,11 +66,8 @@ export function CropCard({ id, name, farmer, location, price, quantity, rating, 
           {/* Header */}
           <div className="mb-3">
             <h3 className="font-semibold text-lg text-foreground mb-1">{name}</h3>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <MapPin size={14} /> {location}
-            </p>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <User size={14} /> By: {farmer}
+              <User size={14} /> By: {seller}
             </p>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Calendar size={14} /> Listed: {formattedDate} <Clock size={14} /> {formattedTime}
@@ -117,7 +114,7 @@ export function CropCard({ id, name, farmer, location, price, quantity, rating, 
                 </>
               )}
             </Button>
-            <Button variant="outline" size="sm" className="flex-1 bg-transparent" onClick={() => handleContactClick(farmer, name)}>
+            <Button variant="outline" size="sm" className="flex-1 bg-transparent" onClick={() => handleContactClick(seller, name)}>
               <MessageCircle size={16} />
               Contact
             </Button>

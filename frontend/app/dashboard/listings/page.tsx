@@ -19,18 +19,18 @@ import { useState } from "react"
 export default function ListingsPage() {
   const { listings, addListing, updateListing, deleteListing } = useListings()
   const [isNewListingDialogOpen, setIsNewListingDialogOpen] = useState(false)
-  const [newListing, setNewListing] = useState<Omit<Listing, "id" | "views" | "inquiries" | "ownerId" | "createdAt">>({
+  const [newListing, setNewListing] = useState<Omit<Listing, "id" | "views" | "inquiries" | "seller" | "isListed" | "status" | "createdAt">>({
     name: "",
-    quantity: "",
-    price: "",
-    status: "active", // Added status
-    image: "", // Added image
+    quantity: 0,
+    price: 0,
+    imageUrl: "", 
+    description: "",
   })
   const [editingListing, setEditingListing] = useState<Listing | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [shake, setShake] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [listingToDeleteId, setListingToDeleteId] = useState<string | null>(null)
+  const [listingToDeleteId, setListingToDeleteId] = useState<number | null>(null)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -39,18 +39,18 @@ export default function ListingsPage() {
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
         if (editingListing) {
-          setEditingListing({ ...editingListing, image: reader.result as string })
+          setEditingListing({ ...editingListing, imageUrl: reader.result as string })
         } else {
-          setNewListing({ ...newListing, image: reader.result as string })
+          setNewListing({ ...newListing, imageUrl: reader.result as string })
         }
       }
       reader.readAsDataURL(file)
     } else {
       setImagePreview(null)
       if (editingListing) {
-        setEditingListing({ ...editingListing, image: undefined })
+        setEditingListing({ ...editingListing, imageUrl: "" })
       } else {
-        setNewListing({ ...newListing, image: undefined })
+        setNewListing({ ...newListing, imageUrl: "" })
       }
     }
   }
@@ -71,17 +71,15 @@ export default function ListingsPage() {
   }
 
   const handleAddListing = () => {
-    // Placeholder for current user ID - replace with actual user ID from auth context
-    const currentUserId = "user-123"
-    addListing(newListing, currentUserId)
-    setNewListing({ name: "", quantity: "", price: "", status: "active", image: "" })
+    addListing(newListing)
+    setNewListing({ name: "", quantity: 0, price: 0, imageUrl: "", description: "" })
     setImagePreview(null)
     setIsNewListingDialogOpen(false)
   }
 
   const handleEditListing = (listing: Listing) => {
     setEditingListing(listing)
-    setImagePreview(listing.image || null)
+    setImagePreview(listing.imageUrl || null)
     setIsNewListingDialogOpen(true)
   }
 
@@ -94,7 +92,7 @@ export default function ListingsPage() {
     }
   }
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setListingToDeleteId(id)
     setShowDeleteConfirm(true)
   }
@@ -120,7 +118,7 @@ export default function ListingsPage() {
           </motion.h1>
           <Button onClick={() => {
             setEditingListing(null)
-            setNewListing({ name: "", quantity: "", price: "", status: "active" })
+            setNewListing({ name: "", quantity: 0, price: 0, imageUrl: "", description: "" })
             setImagePreview(null)
             setIsNewListingDialogOpen(true)
           }}>
@@ -166,8 +164,8 @@ export default function ListingsPage() {
                           transition={{ delay: index * 0.1 }}
                         >
                           <td className="py-4 px-4">
-                            {listing.image ? (
-                              <img src={listing.image} alt={listing.name} className="w-16 h-16 object-cover rounded-md" />
+                            {listing.imageUrl ? (
+                              <img src={listing.imageUrl} alt={listing.name} className="w-16 h-16 object-cover rounded-md" />
                             ) : (
                               <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center text-muted-foreground">
                                 <ImageIcon size={24} />
@@ -245,8 +243,8 @@ export default function ListingsPage() {
                           transition={{ delay: index * 0.1 }}
                         >
                           <td className="py-4 px-4">
-                            {listing.image ? (
-                              <img src={listing.image} alt={listing.name} className="w-16 h-16 object-cover rounded-md" />
+                            {listing.imageUrl ? (
+                              <img src={listing.imageUrl} alt={listing.name} className="w-16 h-16 object-cover rounded-md" />
                             ) : (
                               <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center text-muted-foreground">
                                 <ImageIcon size={24} />
@@ -315,8 +313,8 @@ export default function ListingsPage() {
                   value={editingListing ? editingListing.quantity : newListing.quantity}
                   onChange={(e) =>
                     editingListing
-                      ? setEditingListing({ ...editingListing, quantity: e.target.value })
-                      : setNewListing({ ...newListing, quantity: e.target.value })
+                      ? setEditingListing({ ...editingListing, quantity: parseInt(e.target.value) })
+                      : setNewListing({ ...newListing, quantity: parseInt(e.target.value) })
                   }
                   className={`w-full pl-10 pr-3 py-2 border ${
                     shake && !(editingListing ? editingListing.quantity : newListing.quantity) ? 'border-destructive' : 'border-input'
@@ -335,8 +333,8 @@ export default function ListingsPage() {
                   value={editingListing ? editingListing.price : newListing.price}
                   onChange={(e) =>
                     editingListing
-                      ? setEditingListing({ ...editingListing, price: e.target.value })
-                      : setNewListing({ ...newListing, price: e.target.value })
+                      ? setEditingListing({ ...editingListing, price: parseInt(e.target.value) })
+                      : setNewListing({ ...newListing, price: parseInt(e.target.value) })
                   }
                   className={`w-full pl-10 pr-3 py-2 border ${
                     shake && !(editingListing ? editingListing.price : newListing.price) ? 'border-destructive' : 'border-input'

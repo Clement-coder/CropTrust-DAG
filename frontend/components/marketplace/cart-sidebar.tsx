@@ -20,7 +20,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { cartItems, removeFromCart, updateItemQuantity, calculateTotal, getCartCount } = useCart()
   const [isCheckoutOpen, setCheckoutOpen] = useState(false)
 
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+  const handleQuantityChange = (itemId: number, newQuantity: number) => {
     updateItemQuantity(itemId, newQuantity)
   }
 
@@ -68,9 +68,9 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     {cartItems.map((item) => (
                       <div key={item.id} className="flex items-center gap-4 border-b pb-4 last:border-b-0 last:pb-0">
                         <div className="relative w-16 h-16 flex-shrink-0">
-                          {item.image ? (
+                          {item.imageUrl ? (
                             <Image
-                              src={item.image}
+                              src={item.imageUrl}
                               alt={item.name}
                               layout="fill"
                               objectFit="cover"

@@ -42,13 +42,12 @@ export default function MarketplacePage() {
   const filteredCrops = products.filter((crop) => {
     const matchesSearch =
       crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      crop.farmer.toLowerCase().includes(searchTerm.toLowerCase())
+      crop.seller.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCrop = !filters.cropType || crop.name.includes(filters.cropType)
-    const matchesLocation = !filters.location || crop.location.includes(filters.location)
     const matchesRating = crop.rating >= filters.rating
     const matchesStock = !filters.inStockOnly || crop.status === "active"
 
-    return matchesSearch && matchesCrop && matchesLocation && matchesRating && matchesStock
+    return matchesSearch && matchesCrop && matchesRating && matchesStock
   })
 
   const totalPages = Math.ceil(filteredCrops.length / itemsPerPage)
