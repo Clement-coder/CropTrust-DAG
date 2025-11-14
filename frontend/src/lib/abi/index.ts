@@ -1,1 +1,1 @@
-export * as CropTrustABI from './CropTrust.json'
+export { default as CropTrustABI } from './CropTrust.json';

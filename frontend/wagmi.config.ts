@@ -1,13 +1,13 @@
 import { defineConfig } from '@wagmi/cli'
 import { react } from '@wagmi/cli/plugins'
-import * as abis from './src/lib/abi'
+import { cropTrustAbi } from './src/generated'
 
 export default defineConfig({
   out: 'src/generated.ts',
   contracts: [
     {
       name: 'CropTrust',
-      abi: abis.CropTrustABI.abi,
+      abi: cropTrustAbi,
     },
   ],
   plugins: [react()],

@@ -77,7 +77,8 @@ export function useCart() {
     try {
       for (const item of cartItems) {
         await purchaseCrop({
-          args: [item.id, BigInt(item.quantity)],
+          address: process.env.NEXT_PUBLIC_CROPTRUST_CONTRACT as `0x${string}`,
+          args: [BigInt(item.id), BigInt(item.quantity)],
         });
       }
       // Cart will clear automatically on isPurchaseCropConfirmed

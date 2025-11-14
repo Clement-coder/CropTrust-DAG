@@ -145,6 +145,7 @@ export function useListings() {
 
     try {
       await listCrop({
+        address: process.env.NEXT_PUBLIC_CROPTRUST_CONTRACT as `0x${string}`,
         args: [
           newListing.name,
           newListing.description,
