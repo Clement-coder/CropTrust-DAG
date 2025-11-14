@@ -62,7 +62,7 @@ export function Navigation() {
           {!ready && <div />}
           {ready && !authenticated && (
             <Button variant="outline" asChild>
-              <Link href="/signup" className="flex items-center gap-2">
+              <Link href="/signup">
                 <LogIn size={18} />
                 Sign Up
               </Link>
@@ -71,11 +71,11 @@ export function Navigation() {
           {ready && authenticated && (
             <>
               <Button variant="outline" asChild>
-                <Link href="/dashboard" className="flex items-center gap-2">
+                <Link href="/dashboard">
                   Dashboard
                 </Link>
               </Button>
-              <Button onClick={logout} className="flex items-center gap-2">
+              <Button onClick={logout}>
                 <ArrowRight size={18} />
                 Logout
               </Button>

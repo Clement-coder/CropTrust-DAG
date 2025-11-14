@@ -56,13 +56,13 @@ export function HeroSection() {
         </motion.p>
 
         <motion.div className="flex flex-col sm:flex-row gap-4 justify-center" variants={itemVariants}>
-          <Button size="lg" asChild>
-            <Link href="/signup" className="flex items-center gap-2">
+          <Button size="lg" asChild className="flex items-center gap-2">
+            <Link href="/signup">
               Get Started <ArrowRight size={20} />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="#how-it-works" className="flex items-center gap-2">
+          <Button size="lg" variant="outline" asChild className="flex items-center gap-2">
+            <Link href="#how-it-works">
               <Store size={20} /> Explore Marketplace
             </Link>
           </Button>
